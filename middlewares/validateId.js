@@ -14,6 +14,7 @@ function checkIdFor(type) {
     } else {
       res.status(403).send('❌ Unauthorized or Invalid ID');
     }
+    console.log(`validated ${type} for ${id}`);
   };
 }
 
