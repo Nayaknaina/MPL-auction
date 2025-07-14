@@ -23,7 +23,7 @@
       min-height: 100vh;
       margin: 0;
       padding: 20px;
-      background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://www.shutterstock.com/image-photo/beautiful-sports-stadium-green-grass-600nw-2428080603.jpg');
+      background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://media.istockphoto.com/id/936417012/vector/cricket-stadium-vector-background.jpg?s=612x612&w=0&k=20&c=ktPUWBDjsTAYT0cjroYMkgJG3AQPLPuSOO1Vd8Urgyg=');
       background-size: cover;
       background-position: center;
   }
@@ -53,7 +53,7 @@
 
   .player-card {
       display: flex;
-      background-color: #007bff;
+      background-color: #007bff1c;
       border-radius: 20px;
       padding: 25px;
       align-items: center;
@@ -142,7 +142,7 @@
   }
 
   .team-dashboard, .dev-dashboard {
-      background-color: rgba(0, 0, 0, 0.6);
+    /* background-color: rgba(0, 0, 0, 0.6);*/
       padding: 2rem;
       border-radius: 15px;
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
@@ -221,8 +221,8 @@
     const App = () => {
       const [players, setPlayers] = useState([
         { id: 1, name: 'Virat Kohli', age: 36, city: 'Delhi', basePrice: 200000, category: 'Batsman', currentBid: 200000, team: null, image: 'https://ih1.redbubble.net/image.2918240806.2114/flat,750x,075,f-pad,750x1000,f8f8f8.jpg' },
-        { id: 2, name: 'Rohit Sharma', age: 38, city: 'Mumbai', basePrice: 180000, category: 'Batsman', currentBid: 180000, team: null, image: 'https://via.placeholder.com/200x200?text=Rohit+Sharma' },
-        { id: 3, name: 'Jasprit Bumrah', age: 31, city: 'Ahmedabad', basePrice: 150000, category: 'Bowler', currentBid: 150000, team: null, image: 'https://via.placeholder.com/200x200?text=Jasprit+Bumrah' },
+        { id: 2, name: 'Rohit Sharma', age: 38, city: 'Mumbai', basePrice: 180000, category: 'Batsman', currentBid: 180000, team: null, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2LTjAFR8pK4zVrRAlg2YYkQyqFdoyAJE7rGrlYVdJtR3R0pPbm1WtQe8g1g-MZN6UQ9s&usqp=CAU' },
+        { id: 3, name: 'Jasprit Bumrah', age: 31, city: 'Ahmedabad', basePrice: 150000, category: 'Bowler', currentBid: 150000, team: null, image: 'https://images.assettype.com/outlookindia/2024-05/7e8b01ec-f7ea-46f5-87d2-84dee6a4e599/Jasprit_Bumrah.png' },
       ]);
       const [teams, setTeams] = useState([
         { id: 1, name: 'Team A', budget: 1000000 },
@@ -395,7 +395,7 @@
                   <p><strong>City -</strong> {players[currentPlayerIndex].city}</p>
                   <p><strong>Category -</strong> {players[currentPlayerIndex].category}</p>
                   <p><strong>Base Price -</strong> ₹{players[currentPlayerIndex].basePrice.toLocaleString('en-IN')}</p>
-                  <p className="base-points"><strong>Current Bid</strong></p>
+              {/*    <p className="base-points"><strong>Current Bid</strong></p>*/}
                 </div>
               </div>
 
