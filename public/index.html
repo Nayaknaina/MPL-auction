@@ -45,6 +45,11 @@
       color: #FFFFFF;
       text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
   }
+  .icon {
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) invert(1); /* This inverts black to white */
+  }
 
   .player-card {
       display: flex;
@@ -396,14 +401,14 @@
 
               <div className="auction-actions">
                 <div className="bid-icon-container">
-                  <img src="images/bid.png" alt="Bid" className="icon" />
+                  <img src="/images/bid.png" alt="Bid" className="icon" />
                 </div>
                 <div className="current-bid">
                   <p className="bid-title">Current Bid</p>
                   <p className="bid-amount">₹{players[currentPlayerIndex].currentBid.toLocaleString('en-IN')}</p>
                 </div>
                 <div className="gavel-icon-container">
-                  <img src="images/GAVEL.png" alt="Gavel" className="icon" />
+                  <img src="/images/GAVEL.png" alt="Gavel" className="icon" />
                 </div>
               </div>
             </>
@@ -509,7 +514,7 @@
       }
 
       return (
-        <div className="w-full">
+        <div className="">
           {dashboardType === 'public' && <PublicDashboard />}
           {dashboardType === 'team' && <TeamDashboard />}
           {dashboardType === 'developer' && <DeveloperDashboard />}
