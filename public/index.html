@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -527,4 +527,1352 @@
     root.render(<App />);
   </script>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MPL Cricket Auction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://media.istockphoto.com/id/936417012/vector/cricket-stadium-vector-background.jpg?s=612x612&w=0&k=20&c=ktPUWBDjsTAYT0cjroYMkgJG3AQPLPuSOO1Vd8Urgyg=');
+      background-size: cover;
+      background-position: center;
+  }
+
+  .auction-container {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px;
+      border-radius: 15px;
+  }
+
+  .main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 5px;
+      color: #FFFFFF;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .icon {
+      width: 80px;
+      height: 80px;
+      filter: brightness(0) invert(1);
+  }
+
+  .player-card {
+      display: flex;
+      background-color: #007bff1c;
+      border-radius: 20px;
+      padding: 25px;
+      align-items: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      margin-bottom: 2rem;
+  }
+
+  .player-image-container {
+      text-align: center;
+      margin-right: 25px;
+      flex-shrink: 0;
+  }
+
+  .player-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 15px;
+      border: 4px solid white;
+      object-fit: cover;
+  }
+
+  .player-category {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1.2rem;
+  }
+
+  .player-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px 25px;
+      width: 100%;
+  }
+
+  .player-details p {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+  }
+
+  .player-details strong {
+      font-weight: bold;
+  }
+
+  .base-points {
+      grid-column: 3;
+      justify-self: end;
+      font-weight: bold !important;
+      font-size: 1.3rem !important;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 5px 10px;
+      border-radius: 8px;
+  }
+
+  .auction-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .current-bid {
+      background-color: #1a1a4a;
+      border: 3px solid #f0c419;
+      border-radius: 20px;
+      padding: 20px 40px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .bid-title {
+      margin: 0 0 10px 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+  }
+
+  .bid-amount {
+      margin: 0;
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: #f0c419;
+  }
+
+  .team-dashboard, .dev-dashboard {
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  .team-dashboard h2, .dev-dashboard h2 {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
+  }
+
+  .team-dashboard select {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+  }
+
+  .dev-dashboard input, .dev-dashboard select {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+  }
+
+  .team-dashboard button, .dev-dashboard button {
+      background-color: #f0c419;
+      color: #1a1a4a;
+      font-weight: bold;
+      padding: 12px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+  }
+
+  .team-dashboard button:hover, .dev-dashboard button:hover {
+      background-color: #ffde7a;
+  }
+
+  .dev-dashboard ul {
+      list-style: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: rgba(10, 10, 10, 0.7);
+      border-radius: 8px;
+      padding: 10px;
+  }
+
+  .dev-dashboard li {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .team-history {
+      margin-top: 2rem;
+      background-color: rgba(10, 10, 10, 0.7);
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+  }
+
+  .team-history h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-align: center;
+  }
+
+  .team-history ul {
+      list-style: none;
+      padding: 0;
+  }
+
+  .team-history li {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 1.1rem;
+  }
+
+  .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-left-color: #f0c419;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+  }
+
+  .firecracker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+  }
+
+  .firecracker-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #f0c419, #ff4444);
+      border-radius: 50%;
+      animation: firecracker-burst 1s ease-out forwards;
+  }
+
+  .countdown-timer {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #f0c419;
+      text-shadow: 0 0 10px rgba(240, 196, 25, 0.8);
+      animation: pulse 1s infinite;
+      text-align: center;
+      margin-top: 20px;
+  }
+
+  .sold-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #f0c419;
+      color: #1a1a4a;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  @keyframes spin {
+      to { transform: rotate(360deg); }
+  }
+
+  @keyframes firecracker-burst {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+  }
+
+  @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+  <div id="root" class="flex justify-center items-center min-h-screen w-full"></div>
+  <script type="text/babel">
+    console.log('Babel loaded, starting React');
+    const { useState, useEffect } = React;
+
+    const socket = io('http://localhost:3000/', {
+      reconnectionAttempts: 20,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 5000,
+      forceNew: false,
+    });
+
+    const App = () => {
+      const [players, setPlayers] = useState([
+        { id: 1, name: 'Virat Kohli', age: 36, city: 'Delhi', basePrice: 200000, category: 'Batsman', currentBid: 200000, team: null, image: 'https://ih1.redbubble.net/image.2918240806.2114/flat,750x,075,f-pad,750x1000,f8f8f8.jpg' },
+        { id: 2, name: 'Rohit Sharma', age: 38, city: 'Mumbai', basePrice: 180000, category: 'Batsman', currentBid: 180000, team: null, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2LTjAFR8pK4zVrRAlg2YYkQyqFdoyAJE7rGrlYVdJtR3R0pPbm1WtQe8g1g-MZN6UQ9s&usqp=CAU' },
+        { id: 3, name: 'Jasprit Bumrah', age: 31, city: 'Ahmedabad', basePrice: 150000, category: 'Bowler', currentBid: 150000, team: null, image: 'https://images.assettype.com/outlookindia/2024-05/7e8b01ec-f7ea-46f5-87d2-84dee6a4e599/Jasprit_Bumrah.png' },
+      ]);
+      const [teams, setTeams] = useState([
+        { id: 1, name: 'Team A', budget: 1000000 },
+        { id: 2, name: 'Team B', budget: 500000 },
+      ]);
+      const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+      const [bidHistory, setBidHistory] = useState([]);
+      const [isConnected, setIsConnected] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
+      const [connectionError, setConnectionError] = useState(null);
+      const [showFirecracker, setShowFirecracker] = useState(false);
+      const [countdown, setCountdown] = useState(null);
+
+      const path = window.location.pathname;
+      const id = path.split('/')[2];
+      const dashboardType = path.split('/')[1];
+
+      useEffect(() => {
+        try {
+          toastr.options = {
+            positionClass: 'toast-top-right',
+            timeOut: 3000,
+            progressBar: true,
+            showMethod: 'slideDown',
+            hideMethod: 'slideUp',
+          };
+        } catch (e) {
+          console.error('Toastr initialization failed:', e.message);
+        }
+
+        socket.on('connect', () => {
+          console.log('Socket.IO connected:', socket.id, 'Transport:', socket.io.engine.transport.name);
+          setIsConnected(true);
+          setIsLoading(false);
+          setConnectionError(null);
+          try {
+            toastr.success(`Connected to auction server! (ID: ${id})`);
+          } catch (e) {
+            console.error('Toastr success failed:', e.message);
+          }
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Connection Error:', err.message);
+          try {
+            toastr.error(`Connection failed: ${err.message}`, 'Connection Error');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          setIsLoading(false);
+          setConnectionError('Unable to connect to auction server');
+        });
+
+        socket.on('disconnect', (reason) => {
+          console.log(`Disconnected: ${reason}`);
+          setIsConnected(false);
+          try {
+            toastr.warning('Disconnected from server. Attempting to reconnect...', 'Connection Lost');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+        });
+
+        socket.on('playerSold', ({ playerId, bid, teamId }) => {
+          console.log(`Player sold: Player ${playerId}, Bid ${bid}, Team ${teamId}`);
+          setPlayers(prevPlayers =>
+            prevPlayers.map(player =>
+              player.id === playerId ? { ...player, currentBid: bid, team: teamId } : player
+            )
+          );
+          setTeams(prevTeams =>
+            prevTeams.map(team =>
+              team.id === teamId ? { ...team, budget: team.budget - bid } : team
+            )
+          );
+          setBidHistory(prev => [...prev, { playerId, bid, teamId, timestamp: new Date(), action: 'Sold' }]);
+          const playerName = players.find(p => p.id === playerId)?.name;
+          const teamName = teams.find(t => t.id === teamId)?.name;
+          try {
+            toastr.info(`${playerName} sold to ${teamName} for ₹${bid.toLocaleString('en-IN')}`);
+          } catch (e) {
+            console.error('Toastr info failed:', e.message);
+          }
+          if (dashboardType === 'public') {
+            setShowFirecracker(true);
+            setTimeout(() => {
+              setShowFirecracker(false);
+              setCountdown(5);
+            }, 3000);
+          }
+        });
+
+        socket.on('nextPlayer', () => {
+          console.log('Next player event received');
+          setCurrentPlayerIndex(prev => prev + 1);
+          setCountdown(null);
+          const nextPlayer = players[currentPlayerIndex + 1];
+          if (nextPlayer) {
+            try {
+              toastr.warning(`Now auctioning: ${nextPlayer.name}`);
+            } catch (e) {
+              console.error('Toastr warning failed:', e.message);
+            }
+          } else {
+            try {
+              toastr.error('No more players to auction.');
+            } catch (e) {
+              console.error('Toastr error failed:', e.message);
+            }
+          }
+        });
+
+        return () => {
+          socket.off('connect');
+          socket.off('connect_error');
+          socket.off('disconnect');
+          socket.off('playerSold');
+          socket.off('nextPlayer');
+        };
+      }, [currentPlayerIndex, players, teams, dashboardType]);
+
+      useEffect(() => {
+        if (countdown !== null && countdown > 0) {
+          const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+          return () => clearTimeout(timer);
+        } else if (countdown === 0) {
+          if (currentPlayerIndex + 1 < players.length) {
+            socket.emit('nextPlayer');
+          }
+        }
+      }, [countdown, currentPlayerIndex, players.length]);
+
+      const FirecrackerAnimation = () => {
+        const particles = Array.from({ length: 50 }).map((_, i) => {
+          const angle = Math.random() * 2 * Math.PI;
+          const distance = Math.random() * 200;
+          const style = {
+            left: `${50 + Math.cos(angle) * distance}vw`,
+            top: `${50 + Math.sin(angle) * distance}vh`,
+            animationDelay: `${Math.random() * 0.5}s`,
+          };
+          return <div key={i} className="firecracker-particle" style={style}></div>;
+        });
+
+        return <div className="firecracker">{particles}</div>;
+      };
+
+      const sellPlayer = (playerId, bid, teamId) => {
+        if (!playerId) {
+          try {
+            toastr.error('No player available to sell.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        if (!bid || bid <= players.find(p => p.id === playerId).basePrice) {
+          try {
+            toastr.error('Bid must be higher than the base price.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        if (teams.find(t => t.id === teamId).budget < bid) {
+          try {
+            toastr.error('Insufficient team budget.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        console.log(`Selling player: Player ${playerId}, Bid ${bid}, Team ${teamId}`);
+        socket.emit('sellPlayer', { playerId, bid, teamId });
+      };
+
+      const nextPlayer = () => {
+        if (currentPlayerIndex + 1 >= players.length) {
+          try {
+            toastr.error('No more players to auction.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        console.log('Requesting next player');
+        socket.emit('nextPlayer');
+      };
+
+      const PublicDashboard = () => (
+        <div className="auction-container relative">
+          <h1 className="main-title">MPPL OPEN</h1>
+          {showFirecracker && <FirecrackerAnimation />}
+          {players[currentPlayerIndex] ? (
+            <>
+              {players[currentPlayerIndex].team && (
+                <div className="sold-badge">
+                  SOLD to {teams.find(t => t.id === players[currentPlayerIndex].team)?.name}
+                </div>
+              )}
+              <div className="player-card">
+                <div className="player-image-container">
+                  <img src={players[currentPlayerIndex].image} alt={players[currentPlayerIndex].name} className="player-image" />
+                  <p className="player-category">{players[currentPlayerIndex].category}</p>
+                </div>
+                <div className="player-details">
+                  <p><strong>Name -</strong> {players[currentPlayerIndex].name}</p>
+                  <p><strong>Age -</strong> {players[currentPlayerIndex].age}</p>
+                  <p><strong>City -</strong> {players[currentPlayerIndex].city}</p>
+                  <p><strong>Category -</strong> {players[currentPlayerIndex].category}</p>
+                  <p><strong>Base Price -</strong> ₹{players[currentPlayerIndex].basePrice.toLocaleString('en-IN')}</p>
+                </div>
+              </div>
+
+              <div className="auction-actions">
+                <div className="bid-icon-container">
+                  <img src="/images/bid.png" alt="Bid" className="icon" />
+                </div>
+                <div className="current-bid">
+                  <p className="bid-title">Current Bid</p>
+                  <p className="bid-amount">₹{players[currentPlayerIndex].currentBid.toLocaleString('en-IN')}</p>
+                </div>
+                <div className="gavel-icon-container">
+                  <img src="/images/GAVEL.png" alt="Gavel" className="icon" />
+                </div>
+              </div>
+              {countdown !== null && (
+                <div className="countdown-timer">
+                  Next Player in: {countdown}s
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-2xl text-center font-bold">Auction Ended</p>
+          )}
+        </div>
+      );
+
+      const TeamDashboard = () => {
+        const [selectedTeam, setSelectedTeam] = useState(teams[0].id);
+
+        return (
+          <div className="auction-container team-dashboard relative">
+            <h1 className="main-title">Team Dashboard</h1>
+            {players[currentPlayerIndex] ? (
+              <>
+                {players[currentPlayerIndex].team && (
+                  <div className="sold-badge">
+                    SOLD to {teams.find(t => t.id === players[currentPlayerIndex].team)?.name}
+                  </div>
+                )}
+                <div className="text-center">
+                  <img src={players[currentPlayerIndex].image} alt={players[currentPlayerIndex].name} className="player-image mx-auto mb-4" />
+                  <h2 className="text-2xl font-semibold mb-2">Current Player: {players[currentPlayerIndex].name}</h2>
+                  <p className="text-3xl font-bold text-yellow-400 mb-2">Current Bid: ₹{players[currentPlayerIndex].currentBid.toLocaleString('en-IN')}</p>
+                  <p className="text-xl mb-2">Base Price: ₹{players[currentPlayerIndex].basePrice.toLocaleString('en-IN')}</p>
+                  <p className="text-xl mb-4">Your Budget: ₹{teams.find(t => t.id === parseInt(selectedTeam))?.budget.toLocaleString('en-IN')}</p>
+                  <div className="flex justify-center items-center gap-4 mt-4">
+                    <select
+                      className="w-1/4 p-2 rounded-md"
+                      value={selectedTeam}
+                      onChange={(e) => setSelectedTeam(e.target.value)}
+                    >
+                      {teams.map(team => (
+                        <option key={team.id} value={team.id} style={{color: 'black'}}>{team.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="team-history">
+                  <h3>Team History</h3>
+                  <ul>
+                    {bidHistory
+                      .filter(history => history.teamId === parseInt(selectedTeam))
+                      .map((history, index) => (
+                        <li key={index}>
+                          {history.action}: {players.find(p => p.id === history.playerId)?.name} for ₹{history.bid.toLocaleString('en-IN')} at {new Date(history.timestamp).toLocaleTimeString()}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <p className="text-2xl text-center font-bold">Auction Ended</p>
+            )}
+          </div>
+        );
+      };
+
+      const DeveloperDashboard = () => {
+        const [bidAmount, setBidAmount] = useState('');
+        const [selectedTeam, setSelectedTeam] = useState(teams[0].id);
+
+        return (
+          <div className="auction-container dev-dashboard">
+            <h1 className="main-title">Developer Dashboard</h1>
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold">Current Player: {players[currentPlayerIndex]?.name || 'Auction Ended'}</h2>
+              <p className="text-xl">Current Bid: ₹{players[currentPlayerIndex]?.currentBid.toLocaleString('en-IN') || 'N/A'}</p>
+              {players[currentPlayerIndex] && (
+                <div className="flex justify-center items-center gap-4 mt-4">
+                  <input
+                    type="number"
+                    className="w-1/2 p-2 rounded-md"
+                    placeholder="Enter bid amount"
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                  />
+                  <select
+                    className="w-1/4 p-2 rounded-md"
+                    value={selectedTeam}
+                    onChange={(e) => setSelectedTeam(e.target.value)}
+                  >
+                    {teams.map(team => (
+                      <option key={team.id} value={team.id} style={{color: 'black'}}>{team.name}</option>
+                    ))}
+                  </select>
+                  {parseInt(bidAmount) > (players[currentPlayerIndex]?.basePrice || 0) && (
+                    <button
+                      onClick={() => sellPlayer(players[currentPlayerIndex]?.id, parseInt(bidAmount), parseInt(selectedTeam))}
+                    >
+                      Sell Player
+                    </button>
+                  )}
+                </div>
+              )}
+              <button
+                className="mt-4"
+                onClick={nextPlayer}
+              >
+                Next Player
+              </button>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-center mb-2">All Players</h3>
+              <ul>
+                {players.map(player => (
+                  <li key={player.id}>
+                    {player.name} - ₹{player.currentBid.toLocaleString('en-IN')} ({player.team ? teams.find(t => t.id === player.team)?.name : 'Unsold'})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      };
+
+      if (isLoading) {
+        return (
+          <div className="flex justify-center items-center min-h-screen">
+            <div className="spinner"></div>
+          </div>
+        );
+      }
+
+      if (!isConnected && connectionError) {
+        return (
+          <div className="flex justify-center items-center min-h-screen">
+            <div className="text-center">
+              <p className="text-red-500 text-xl mb-4">{connectionError}</p>
+              <button
+                className="btn-secondary text-white p-2 rounded-md"
+                onClick={() => window.location.reload()}
+              >
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="">
+          {dashboardType === 'public' && <PublicDashboard />}
+          {dashboardType === 'team' && <TeamDashboard />}
+          {dashboardType === 'developer' && <DeveloperDashboard />}
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
 </html>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MPL Cricket Auction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://media.istockphoto.com/id/936417012/vector/cricket-stadium-vector-background.jpg?s=612x612&w=0&k=20&c=ktPUWBDjsTAYT0cjroYMkgJG3AQPLPuSOO1Vd8Urgyg=');
+      background-size: cover;
+      background-position: center;
+  }
+
+  .auction-container {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px;
+      border-radius: 15px;
+  }
+
+  .main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 5px;
+      color: #FFFFFF;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .icon {
+      width: 80px;
+      height: 80px;
+      filter: brightness(0) invert(1);
+  }
+
+  .player-card {
+      display: flex;
+      background-color: #007bff1c;
+      border-radius: 20px;
+      padding: 25px;
+      align-items: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      margin-bottom: 2rem;
+  }
+
+  .player-image-container {
+      text-align: center;
+      margin-right: 25px;
+      flex-shrink: 0;
+  }
+
+  .player-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 15px;
+      border: 4px solid white;
+      object-fit: cover;
+  }
+
+  .player-category {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1.2rem;
+  }
+
+  .player-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px 25px;
+      width: 100%;
+  }
+
+  .player-details p {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+  }
+
+  .player-details strong {
+      font-weight: bold;
+  }
+
+  .base-points {
+      grid-column: 3;
+      justify-self: end;
+      font-weight: bold !important;
+      font-size: 1.3rem !important;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 5px 10px;
+      border-radius: 8px;
+  }
+
+  .auction-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .current-bid {
+      background-color: #1a1a4a;
+      border: 3px solid #f0c419;
+      border-radius: 20px;
+      padding: 20px 40px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .bid-title {
+      margin: 0 0 10px 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+  }
+
+  .bid-amount {
+      margin: 0;
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: #f0c419;
+  }
+
+  .team-dashboard, .dev-dashboard {
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  .team-dashboard h2, .dev-dashboard h2 {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
+  }
+
+  .team-dashboard select {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+  }
+
+  .dev-dashboard input, .dev-dashboard select {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+  }
+
+  .team-dashboard button, .dev-dashboard button {
+      background-color: #f0c419;
+      color: #1a1a4a;
+      font-weight: bold;
+      padding: 12px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+  }
+
+  .team-dashboard button:hover, .dev-dashboard button:hover {
+      background-color: #ffde7a;
+  }
+
+  .dev-dashboard ul {
+      list-style: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: rgba(10, 10, 10, 0.7);
+      border-radius: 8px;
+      padding: 10px;
+  }
+
+  .dev-dashboard li {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-left-color: #f0c419;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+  }
+
+  .firecracker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+  }
+
+  .firecracker-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #f0c419, #ff4444);
+      border-radius: 50%;
+      animation: firecracker-burst 1s ease-out forwards;
+  }
+
+  .countdown-timer {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #f0c419;
+      text-shadow: 0 0 10px rgba(240, 196, 25, 0.8);
+      animation: pulse 1s infinite;
+      text-align: center;
+      margin-top: 20px;
+  }
+
+  .sold-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #f0c419;
+      color: #1a1a4a;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  @keyframes spin {
+      to { transform: rotate(360deg); }
+  }
+
+  @keyframes firecracker-burst {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+  }
+
+  @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+  <div id="root" class="flex justify-center items-center min-h-screen w-full"></div>
+  <script type="text/babel">
+    console.log('Babel loaded, starting React');
+    const { useState, useEffect } = React;
+
+    const socket = io('http://localhost:3000/', {
+      reconnectionAttempts: 20,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 5000,
+      forceNew: false,
+    });
+
+    const App = () => {
+      const [players, setPlayers] = useState([
+        { id: 1, name: 'Virat Kohli', age: 36, city: 'Delhi', basePrice: 200000, category: 'Batsman', currentBid: 200000, team: null, image: 'https://ih1.redbubble.net/image.2918240806.2114/flat,750x,075,f-pad,750x1000,f8f8f8.jpg' },
+        { id: 2, name: 'Rohit Sharma', age: 38, city: 'Mumbai', basePrice: 180000, category: 'Batsman', currentBid: 180000, team: null, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2LTjAFR8pK4zVrRAlg2YYkQyqFdoyAJE7rGrlYVdJtR3R0pPbm1WtQe8g1g-MZN6UQ9s&usqp=CAU' },
+        { id: 3, name: 'Jasprit Bumrah', age: 31, city: 'Ahmedabad', basePrice: 150000, category: 'Bowler', currentBid: 150000, team: null, image: 'https://images.assettype.com/outlookindia/2024-05/7e8b01ec-f7ea-46f5-87d2-84dee6a4e599/Jasprit_Bumrah.png' },
+      ]);
+      const [teams, setTeams] = useState([
+        { id: 1, name: 'Team A', budget: 1000000 },
+        { id: 2, name: 'Team B', budget: 500000 },
+      ]);
+      const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+      const [bidHistory, setBidHistory] = useState([]);
+      const [isConnected, setIsConnected] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
+      const [connectionError, setConnectionError] = useState(null);
+      const [showFirecracker, setShowFirecracker] = useState(false);
+      const [countdown, setCountdown] = useState(null);
+
+      const path = window.location.pathname;
+      const id = path.split('/')[2];
+      const dashboardType = path.split('/')[1];
+
+      useEffect(() => {
+        try {
+          toastr.options = {
+            positionClass: 'toast-top-right',
+            timeOut: 3000,
+            progressBar: true,
+            showMethod: 'slideDown',
+            hideMethod: 'slideUp',
+          };
+        } catch (e) {
+          console.error('Toastr initialization failed:', e.message);
+        }
+
+        socket.on('connect', () => {
+          console.log('Socket.IO connected:', socket.id, 'Transport:', socket.io.engine.transport.name);
+          setIsConnected(true);
+          setIsLoading(false);
+          setConnectionError(null);
+          try {
+            toastr.success(`Connected to auction server! (ID: ${id})`);
+          } catch (e) {
+            console.error('Toastr success failed:', e.message);
+          }
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Connection Error:', err.message);
+          try {
+            toastr.error(`Connection failed: ${err.message}`, 'Connection Error');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          setIsLoading(false);
+          setConnectionError('Unable to connect to auction server');
+        });
+
+        socket.on('disconnect', (reason) => {
+          console.log(`Disconnected: ${reason}`);
+          setIsConnected(false);
+          try {
+            toastr.warning('Disconnected from server. Attempting to reconnect...', 'Connection Lost');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+        });
+
+        socket.on('playerSold', ({ playerId, bid, teamId }) => {
+          console.log(`Player sold: Player ${playerId}, Bid ${bid}, Team ${teamId}`);
+          setPlayers(prevPlayers =>
+            prevPlayers.map(player =>
+              player.id === playerId ? { ...player, currentBid: bid, team: teamId } : player
+            )
+          );
+          setTeams(prevTeams =>
+            prevTeams.map(team =>
+              team.id === teamId ? { ...team, budget: team.budget - bid } : team
+            )
+          );
+          setBidHistory(prev => [...prev, { playerId, bid, teamId, timestamp: new Date() }]);
+          const playerName = players.find(p => p.id === playerId)?.name;
+          const teamName = teams.find(t => t.id === teamId)?.name;
+          try {
+            toastr.info(`${playerName} sold to ${teamName} for ₹${bid.toLocaleString('en-IN')}`);
+          } catch (e) {
+            console.error('Toastr info failed:', e.message);
+          }
+          if (dashboardType === 'public') {
+            setShowFirecracker(true);
+            setTimeout(() => {
+              setShowFirecracker(false);
+              setCountdown(5);
+            }, 3000);
+          }
+        });
+
+        socket.on('nextPlayer', () => {
+          console.log('Next player event received');
+          setCurrentPlayerIndex(prev => prev + 1);
+          setCountdown(null);
+          const nextPlayer = players[currentPlayerIndex + 1];
+          if (nextPlayer) {
+            try {
+              toastr.warning(`Now auctioning: ${nextPlayer.name}`);
+            } catch (e) {
+              console.error('Toastr warning failed:', e.message);
+            }
+          } else {
+            try {
+              toastr.error('No more players to auction.');
+            } catch (e) {
+              console.error('Toastr error failed:', e.message);
+            }
+          }
+        });
+
+        return () => {
+          socket.off('connect');
+          socket.off('connect_error');
+          socket.off('disconnect');
+          socket.off('playerSold');
+          socket.off('nextPlayer');
+        };
+      }, [currentPlayerIndex, players, teams, dashboardType]);
+
+      useEffect(() => {
+        if (countdown !== null && countdown > 0) {
+          const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+          return () => clearTimeout(timer);
+        } else if (countdown === 0) {
+          if (currentPlayerIndex + 1 < players.length) {
+            socket.emit('nextPlayer');
+          }
+        }
+      }, [countdown, currentPlayerIndex, players.length]);
+
+      const FirecrackerAnimation = () => {
+        const particles = Array.from({ length: 50 }).map((_, i) => {
+          const angle = Math.random() * 2 * Math.PI;
+          const distance = Math.random() * 200;
+          const style = {
+            left: `${50 + Math.cos(angle) * distance}vw`,
+            top: `${50 + Math.sin(angle) * distance}vh`,
+            animationDelay: `${Math.random() * 0.5}s`,
+          };
+          return <div key={i} className="firecracker-particle" style={style}></div>;
+        });
+
+        return <div className="firecracker">{particles}</div>;
+      };
+
+      const sellPlayer = (playerId, bid, teamId) => {
+        if (!playerId) {
+          try {
+            toastr.error('No player available to sell.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        if (!bid || bid <= players.find(p => p.id === playerId).basePrice) {
+          try {
+            toastr.error('Bid must be higher than the base price.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        if (teams.find(t => t.id === teamId).budget < bid) {
+          try {
+            toastr.error('Insufficient team budget.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        console.log(`Selling player: Player ${playerId}, Bid ${bid}, Team ${teamId}`);
+        socket.emit('sellPlayer', { playerId, bid, teamId });
+      };
+
+      const nextPlayer = () => {
+        if (currentPlayerIndex + 1 >= players.length) {
+          try {
+            toastr.error('No more players to auction.');
+          } catch (e) {
+            console.error('Toastr error failed:', e.message);
+          }
+          return;
+        }
+        console.log('Requesting next player');
+        socket.emit('nextPlayer');
+      };
+
+      const PublicDashboard = () => (
+        <div className="auction-container relative">
+          <h1 className="main-title">MPPL OPEN</h1>
+          {showFirecracker && <FirecrackerAnimation />}
+          {players[currentPlayerIndex] ? (
+            <>
+              {players[currentPlayerIndex].team && (
+                <div className="sold-badge">
+                  SOLD to {teams.find(t => t.id === players[currentPlayerIndex].team)?.name}
+                </div>
+              )}
+              <div className="player-card">
+                <div className="player-image-container">
+                  <img src={players[currentPlayerIndex].image} alt={players[currentPlayerIndex].name} className="player-image" />
+                  <p className="player-category">{players[currentPlayerIndex].category}</p>
+                </div>
+                <div className="player-details">
+                  <p><strong>Name -</strong> {players[currentPlayerIndex].name}</p>
+                  <p><strong>Age -</strong> {players[currentPlayerIndex].age}</p>
+                  <p><strong>City -</strong> {players[currentPlayerIndex].city}</p>
+                  <p><strong>Category -</strong> {players[currentPlayerIndex].category}</p>
+                  <p><strong>Base Price -</strong> ₹{players[currentPlayerIndex].basePrice.toLocaleString('en-IN')}</p>
+                </div>
+              </div>
+
+              <div className="auction-actions">
+                <div className="bid-icon-container">
+                  <img src="/images/bid.png" alt="Bid" className="icon" />
+                </div>
+                <div className="current-bid">
+                  <p className="bid-title">Current Bid</p>
+                  <p className="bid-amount">₹{players[currentPlayerIndex].currentBid.toLocaleString('en-IN')}</p>
+                </div>
+                <div className="gavel-icon-container">
+                  <img src="/images/GAVEL.png" alt="Gavel" className="icon" />
+                </div>
+              </div>
+              {countdown !== null && (
+                <div className="countdown-timer">
+                  Next Player in: {countdown}s
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-2xl text-center font-bold">Auction Ended</p>
+          )}
+        </div>
+      );
+
+      const TeamDashboard = () => {
+        const [selectedTeam, setSelectedTeam] = useState(teams[0].id);
+
+        return (
+          <div className="auction-container team-dashboard relative">
+            <h1 className="main-title">Team Dashboard</h1>
+            {players[currentPlayerIndex] ? (
+              <>
+                {players[currentPlayerIndex].team && (
+                  <div className="sold-badge">
+                    SOLD to {teams.find(t => t.id === players[currentPlayerIndex].team)?.name}
+                  </div>
+                )}
+                <div className="text-center">
+                  <img src={players[currentPlayerIndex].image} alt={players[currentPlayerIndex].name} className="player-image mx-auto mb-4" />
+                  <h2 className="text-2xl font-semibold mb-2">Current Player: {players[currentPlayerIndex].name}</h2>
+                  <p className="text-3xl font-bold text-yellow-400 mb-2">Current Bid: ₹{players[currentPlayerIndex].currentBid.toLocaleString('en-IN')}</p>
+                  <p className="text-xl mb-2">Base Price: ₹{players[currentPlayerIndex].basePrice.toLocaleString('en-IN')}</p>
+                  <p className="text-xl mb-4">Your Budget: ₹{teams.find(t => t.id === parseInt(selectedTeam))?.budget.toLocaleString('en-IN')}</p>
+                  <div className="flex justify-center items-center gap-4 mt-4">
+                    <select
+                      className="w-1/4 p-2 rounded-md"
+                      value={selectedTeam}
+                      onChange={(e) => setSelectedTeam(e.target.value)}
+                    >
+                      {teams.map(team => (
+                        <option key={team.id} value={team.id} style={{color: 'black'}}>{team.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-2xl text-center font-bold">Auction Ended</p>
+            )}
+          </div>
+        );
+      };
+
+      const DeveloperDashboard = () => {
+        const [bidAmount, setBidAmount] = useState('');
+        const [selectedTeam, setSelectedTeam] = useState(teams[0].id);
+
+        return (
+          <div className="auction-container dev-dashboard">
+            <h1 className="main-title">Developer Dashboard</h1>
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold">Current Player: {players[currentPlayerIndex]?.name || 'Auction Ended'}</h2>
+              <p className="text-xl">Current Bid: ₹{players[currentPlayerIndex]?.currentBid.toLocaleString('en-IN') || 'N/A'}</p>
+              {players[currentPlayerIndex] && (
+                <div className="flex justify-center items-center gap-4 mt-4">
+                  <input
+                    type="number"
+                    className="w-1/2 p-2 rounded-md"
+                    placeholder="Enter bid amount"
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                  />
+                  <select
+                    className="w-1/4 p-2 rounded-md"
+                    value={selectedTeam}
+                    onChange={(e) => setSelectedTeam(e.target.value)}
+                  >
+                    {teams.map(team => (
+                      <option key={team.id} value={team.id} style={{color: 'black'}}>{team.name}</option>
+                    ))}
+                  </select>
+                  {parseInt(bidAmount) > (players[currentPlayerIndex]?.basePrice || 0) && (
+                    <button
+                      onClick={() => sellPlayer(players[currentPlayerIndex]?.id, parseInt(bidAmount), parseInt(selectedTeam))}
+                    >
+                      Sell Player
+                    </button>
+                  )}
+                </div>
+              )}
+              <button
+                className="mt-4"
+                onClick={nextPlayer}
+              >
+                Next Player
+              </button>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-center mb-2">All Players</h3>
+              <ul>
+                {players.map(player => (
+                  <li key={player.id}>
+                    {player.name} - ₹{player.currentBid.toLocaleString('en-IN')} ({player.team ? teams.find(t => t.id === player.team)?.name : 'Unsold'})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      };
+
+      if (isLoading) {
+        return (
+          <div className="flex justify-center items-center min-h-screen">
+            <div className="spinner"></div>
+          </div>
+        );
+      }
+
+      if (!isConnected && connectionError) {
+        return (
+          <div className="flex justify-center items-center min-h-screen">
+            <div className="text-center">
+              <p className="text-red-500 text-xl mb-4">{connectionError}</p>
+              <button
+                className="btn-secondary text-white p-2 rounded-md"
+                onClick={() => window.location.reload()}
+              >
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="">
+          {dashboardType === 'public' && <PublicDashboard />}
+          {dashboardType === 'team' && <TeamDashboard />}
+          {dashboardType === 'developer' && <DeveloperDashboard />}
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html> -->
