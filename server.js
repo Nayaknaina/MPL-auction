@@ -54,7 +54,7 @@ const io = socketIo(server);
 let players = [
   { id: 1, name: 'Virat Kohli', age: 36, city: 'Delhi', basePrice: 200000, category: 'Batsman', currentBid: 200000, team: null, image: 'https://ih1.redbubble.net/image.2918240806.2114/flat,750x,075,f-pad,750x1000,f8f8f8.jpg' },
   { id: 2, name: 'Rohit Sharma', age: 38, city: 'Mumbai', basePrice: 180000, category: 'Batsman', currentBid: 180000, team: null, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2LTjAFR8pK4zVrRAlg2YYkQyqFdoyAJE7rGrlYVdJtR3R0pPbm1WtQe8g1g-MZN6UQ9s&usqp=CAU' },
-  { id: 3, name: 'Jasprit Bumrah', age: 31, city: 'Ahmedabad', basePrice: 150000, category: 'Bowler', currentBid: 150000, team: null, image: 'https://images.assettype.com/outlookindia/2024-05/7e8b01ec-f7ea-46f5-87d2ماند84dee6a4e599/Jasprit_Bumrah.png' },
+  { id: 3, name: 'Jasprit Bumrah', age: 31, city: 'Ahmedabad', basePrice: 150000, category: 'Bowler', currentBid: 150000, team: null, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2FOXoSn64PairOc3SdDKuHDxp-SUlL2gxWyAqKtaX7sqIdp4Q9SGDHFOj_kECwzZGPjc&usqp=CAU' },
 ];
 let teams = [
   { id: 1, name: 'Team A', budget: 1000000 },

@@ -870,8 +870,8 @@
       }
 
       .icon {
-          width: 30px;
-          height: 30px;
+          width: 60px;
+          height: 60px;
       }
 
       .countdown-timer {
@@ -1219,7 +1219,14 @@
       );
 
       const TeamDashboard = () => {
-        const [selectedTeam, setSelectedTeam] = useState(teams[0]?.id || '');
+        const [selectedTeam, setSelectedTeam] = useState(() => {
+          const savedTeam = localStorage.getItem('selectedTeam');
+          return savedTeam || teams[0]?.id || '';
+        });
+
+        useEffect(() => {
+          localStorage.setItem('selectedTeam', selectedTeam);
+        }, [selectedTeam]);
 
         return (
           <div className="auction-container team-dashboard relative">
